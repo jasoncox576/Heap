@@ -7,32 +7,36 @@
 using namespace std;
 
 /*
- * 
+ *
  */
 
 
 class HeapTree {
-    
+
 public:
     HeapTree(int val) {
-        
+
         data = val;
-        
+
     }
     HeapTree() {
 
         data = 0;
     }
     int data;
+
+
     HeapTree* left;
     HeapTree* right;
 
-    
+
     void print() {
-        
+
     }
-    
+
 };
+
+
 
 
 void print_level_order(HeapTree* node) {
@@ -67,25 +71,25 @@ void print_level_order(HeapTree* node) {
 		}
 
 		if(current_level == 0) swap(current_level, next_level);
-	} 
+	}
 
 }
 
-    
-HeapTree construct(vector<int>& arr, HeapTree node, int index) {
+
+HeapTree* construct(vector<int>& arr, HeapTree* node, int index) {
         cout << "in construct method" << endl;
 
         if(index < arr.size()) {
             cout << "passed if conditional " << arr[index] << endl;
-            HeapTree temp = HeapTree(arr[index]);
+            HeapTree* temp = new HeapTree(arr[index]);
             node = temp;
-            cout << "Node being set to: " << arr[index] << " at index " << index << endl;
-            //for(int x : arr) cout << x << endl;
-            HeapTree left = construct(arr, *node.left, index*2 + 1);
-            node.left = &left;
+            node->left = new HeapTree();
+            node->left = construct(arr, node->left, index*2 + 1);
+            if(node->left) cout << "printing left: " << node->left->data << endl;
 
-            HeapTree right = construct(arr, *node.right, index*2 + 2);
-            node.right = &right;
+            node->right = new HeapTree();
+            node->right = construct(arr, node->right, index*2 + 2);
+
         }
         //node.left = &left;
         //node.right = &right;
@@ -97,47 +101,51 @@ HeapTree construct(vector<int>& arr, HeapTree node, int index) {
 
 
 vector<int> getInts() {
-    
+
     vector<int> retvec;
     int i;
     while(cin >> i) {
         if(i == -0) break;
         retvec.push_back(i);
-        
+
     }
     return retvec;
-    
-    
-    
-    
+
+
+
+
 }
 
 int main(int argc, char** argv) {
 
     vector<int> myvec;
-    
+
     //myvec = getInts();
-    myvec = {67, 23, 40, 85, 1, 2, 30, 90, 123};
+   //vec = {67, 23, 40, 85, 1, 2, 30, 90, 123};
+   //yvec = {100, 43, 45, 23, 54, 2, 1, 3, 5, 80, 98, 45};
+    for(int i = 1;i < 100; ++i) {
+    	myvec.push_back(i);
+    }
 
     std::sort(myvec.begin(), myvec.end());
     std::reverse(myvec.begin(), myvec.end());
     for(int x : myvec) cout << x << " ";
         cout << endl;
-    
 
 
-    
+
     HeapTree root(10);
+    cout << root.data << endl;
     cout << "Root node constructed" << endl;
 
-    root = construct(myvec, root, 0);
+
+    root = *construct(myvec, &root, 0);
     cout << "Heap fully constructed" << endl;
 
 
     print_level_order(&root);
-    
+
 
 
     return 0;
 }
-
