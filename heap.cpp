@@ -69,26 +69,41 @@ HeapTree* searchN(HeapTree* root, int start, int end) {
 void max_heapify(HeapTree* root) {
 
 	if(root->left) {
-
-		if(root->left->data > root->data) {
-			int leftdata = root->left->data;
-			int rootdata = root->data;
-			root->left->data = rootdata;
-			root->data = leftdata;
-		}
 		max_heapify(root->left);
 	}
+	if(root->right) {
+		max_heapify(root->right);
+	}
 
+	int leftdata = 0;
+	int rightdata = 0;
+	if(root->left) {
+
+		leftdata = root->left->data;
+	}
 	if(root->right) {
 
-		if(root->right->data > root->data) {
-			int rightdata = root->right->data;
-			int rootdata = root->data;
-			root->right->data = rootdata;
-			root->data = rightdata;
+		rightdata = root->right->data;
+	}
 
+	int greaterdata = max(leftdata, rightdata);
+
+	if(greaterdata > root->data && greaterdata > 0) {
+
+		if(leftdata > rightdata) {
+			root->left->data = root->data;
+			root->data = greaterdata;
+			max_heapify(root->left);
 		}
-		max_heapify(root->right);
+		if(rightdata > leftdata) {
+			root->right->data = root->data;
+			root->data = greaterdata;
+			max_heapify(root->right);
+		}
+
+
+
+
 	}
 
 }
@@ -117,6 +132,7 @@ void deleteMax(HeapTree* root, int heapSize) {
 
 	HeapTree* replacerptr;
 	*replacerNode = *replacerptr;
+	replacerNode->data = NULL;
 	replacerNode->left = NULL;
 	replacerNode->right = NULL;
 
@@ -251,6 +267,7 @@ int main(int argc, char** argv) {
 
 
     print_level_order(&root);
+    cout << "Heap max-heapified" << endl;
 
     deleteMax(&root, heap_size);
     cout << endl;
@@ -271,3 +288,4 @@ int main(int argc, char** argv) {
 
     return 0;
 }
+
