@@ -15,6 +15,8 @@ using namespace std;
 
 class HeapTree {
 
+    int size;
+
 public:
     HeapTree(int val) {
 
@@ -31,8 +33,8 @@ public:
     HeapTree* left;
     HeapTree* right;
 
-
-
+inline int getSize() { return size; }
+inline int setSize(int s) {size = s;}
 
 };
 
@@ -124,9 +126,9 @@ void max_heapify(HeapTree* root) {
 
 
 
-void deleteMax(HeapTree* root, int heapSize) {
+void deleteMax(HeapTree* root) {
 
-	HeapTree* replacerNode = searchN(root, 0, heapSize);
+	HeapTree* replacerNode = searchN(root, 0, root->getSize());
 	int replacerData = replacerNode->data;
 	root->data = replacerData;
 
@@ -135,6 +137,8 @@ void deleteMax(HeapTree* root, int heapSize) {
 	replacerNode->data = NULL;
 	replacerNode->left = NULL;
 	replacerNode->right = NULL;
+
+	root->setSize(root->getSize()-1);
 
 	max_heapify(root);
 
@@ -190,9 +194,9 @@ void print_level_order(HeapTree* node) {
 HeapTree* construct(vector<int>& arr, HeapTree* node, int index, deque<HeapTree*>& dbucket) {
 
         if(index < arr.size()) {
-
             HeapTree* temp = new HeapTree(arr[index]);
             node = temp;
+	    node->setSize(arr.size());
             dbucket.push_front(node);
             node->left = construct(arr, node->left, index*2 + 1, dbucket);
 
@@ -232,6 +236,72 @@ void deleteHeap(deque<HeapTree*> tree) {
 
 }
 
+void deleteNode(HeapTree* root, int n) {
+
+    HeapTree* dnode = searchN(root, 0, n);
+    HeapTree* last = searchN(root, 0, root->getSize());
+
+    swap(dnode->data, last->data);
+
+    HeapTree* replacePtr;
+    *dnode = *replacePtr;
+    dnode->data = NULL;
+    dnode->left = NULL;
+    dnode->right = NULL;
+
+    root->setSize(root->getSize()-1);
+
+    max_heapify(root);
+
+}
+
+
+void getPriorityQueue(HeapTree* root, deque<pair<HeapTree*, int>>& order, int level=0) {
+
+	
+    if(root->left && root->right) {
+    	getPriorityQueue(root->right, order, level+1);
+	getPriorityQueue(root->left, order, level+1);
+    }
+    else {
+	if(!order.empty()) {
+	    int backlevel = order.back().second;
+	    if(level <= backlevel) {
+	        order.push_front(pair<HeapTree*, int>(root, level));
+	    
+	    }
+	
+	}
+	else {
+            order.push_front(pair<HeapTree*, int>(root, level));
+	}
+    }
+
+
+
+}
+
+void insertNode(HeapTree* root, int data, deque<HeapTree*>& dbucket) {
+
+    deque<pair<HeapTree*, int>> order;
+    getPriorityQueue(root, order);
+
+    HeapTree* topNode = order.front().first;
+    order.pop_front();
+
+    if(!topNode->left) {
+	topNode->left = new HeapTree(data);
+	dbucket.push_front(topNode->left);
+    }
+    else {
+	if (!topNode->right) {
+            topNode->right = new HeapTree(data);
+	    dbucket.push_front(topNode->right);
+	}
+    }
+    max_heapify(root);
+
+}
 
 
 
@@ -245,7 +315,7 @@ int main(int argc, char** argv) {
 
    //myvec = {100, 43, 45, 23, 54, 2, 1, 3, 5, 80, 98, 45};
 
-    myvec = {12, 4243, 34, 12, 60, 43, 5, 34, 6, 3, 5, 7, 8, 23, 21, 23, 4, 44, 55, 66, 45, 20, 23, 45, 69, 39, 46, 13};
+    myvec = {10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
     heap_size = myvec.size() - 1;
 
     //std::sort(myvec.begin(), myvec.end());
@@ -269,7 +339,7 @@ int main(int argc, char** argv) {
     print_level_order(&root);
     cout << "Heap max-heapified" << endl;
 
-    deleteMax(&root, heap_size);
+    deleteMax(&root);
     cout << endl;
     cout << endl;
 
@@ -277,9 +347,27 @@ int main(int argc, char** argv) {
     cout << "root node deleted" << endl;
 
 
-    cout << "deleted" << endl;
-    cout << "It worked!" << endl;
+    
+    deleteNode(&root, 5);
+    cout << endl;
+    cout << endl;
 
+    print_level_order(&root);
+    cout << "Element at index 5 deleted" << endl;
+
+    for(int i = 0; i < 8; ++i) {
+	
+   	insertNode(&root, (i+100)*2, dbucket); 
+	cout << endl;
+	cout << endl;
+	print_level_order(&root);
+	
+    }
+    cout << endl;
+    cout << endl;
+
+    print_level_order(&root);
+    cout << "Element added with key of 5000" << endl;
 
     deleteHeap(dbucket);
 
