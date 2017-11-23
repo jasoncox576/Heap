@@ -33,8 +33,17 @@ public:
     HeapTree* left = NULL;
     HeapTree* right = NULL;
 
-inline int getSize() { return size; }
-inline int setSize(int s) {size = s;}
+    inline int getSize() { return size; }
+    inline int setSize(int s) {size = s;}
+
+    ~HeapTree() {
+
+	if(left) delete left;
+	if(right) delete right;
+
+
+    }
+
 
 };
 
@@ -191,23 +200,18 @@ void print_level_order(HeapTree* node) {
 }
 
 
-HeapTree* construct(vector<int>& arr, HeapTree* node, int index, deque<HeapTree*>& dbucket) {
+HeapTree* construct(vector<int>& arr, HeapTree* node, int index) {
         if(index < arr.size()) {
             HeapTree* temp = new HeapTree(arr[index]);
             node = temp;
             node->setSize(arr.size()-1);
-            dbucket.push_front(node);
-            node->left = construct(arr, node->left, index*2 + 1, dbucket);
+            node->left = construct(arr, node->left, index*2 + 1);
 
-            node->right = construct(arr, node->right, index*2 + 2, dbucket);
+            node->right = construct(arr, node->right, index*2 + 2);
 
         }
         return node;
     }
-
-
-
-
 
 
 vector<int> getInts() {
@@ -220,10 +224,6 @@ vector<int> getInts() {
 
     }
     return retvec;
-
-
-
-
 }
 
 
@@ -239,14 +239,7 @@ bool isNotNull(HeapTree* node) {
 
 
 
-void deleteHeap(deque<HeapTree*> tree) {
 
-    // deleting all of the nodes in tree (getting rid of the heap)
-    for(HeapTree* ptr : tree) {
-    	delete ptr;
-    }
-
-}
 
 void deleteNode(HeapTree* root, int n) {
 
@@ -291,7 +284,7 @@ void getPriorityQueue(HeapTree* root, deque<pair<HeapTree*, int>>& order, int le
 
 }
 
-void insertNode(HeapTree* root, int data, deque<HeapTree*>& dbucket) {
+void insertNode(HeapTree* root, int data) {
 
     deque<pair<HeapTree*, int>> order;
     getPriorityQueue(root, order);
@@ -303,14 +296,12 @@ void insertNode(HeapTree* root, int data, deque<HeapTree*>& dbucket) {
 		topNode->left = new HeapTree(data);
 		topNode->left->left = NULL;
 		topNode->left->right = NULL;
-		dbucket.push_front(topNode->left);
     }
     else {
 		if(!isNotNull(topNode->right)) {
 			topNode->right = new HeapTree(data);
 			topNode->right->left = NULL;
 			topNode->right->right = NULL;
-			dbucket.push_front(topNode->right);
 		}
     }
     int size = root->getSize();
@@ -318,14 +309,14 @@ void insertNode(HeapTree* root, int data, deque<HeapTree*>& dbucket) {
     max_heapify(root);
 
 }
-HeapTree* mergeRecursive(HeapTree* root, HeapTree* merger, deque<pair<HeapTree*, int>>& order, deque<HeapTree*>& dbucket) {
+HeapTree* mergeRecursive(HeapTree* root, HeapTree* merger, deque<pair<HeapTree*, int>>& order) {
 
 
 	if(isNotNull(merger->left)) {
-		mergeRecursive(root, merger->left, order, dbucket);
+		mergeRecursive(root, merger->left, order);
 	}
 	if(isNotNull(merger->right)) {
-		mergeRecursive(root, merger->right, order, dbucket);
+		mergeRecursive(root, merger->right, order);
 	}
 
 	if(order.empty()) {
@@ -339,14 +330,12 @@ HeapTree* mergeRecursive(HeapTree* root, HeapTree* merger, deque<pair<HeapTree*,
 		topNode->left = new HeapTree(merger->data);
 		topNode->left->left = NULL;
 		topNode->left->right = NULL;
-		dbucket.push_front(topNode->left);
 	}
 	else {
 		if(!isNotNull(topNode->right)) {
 			topNode->right = new HeapTree(merger->data);
 			topNode->right->left = NULL;
 			topNode->right->right = NULL;
-			dbucket.push_front(topNode->right);
 		}
 	}
 		int size = root->getSize();
@@ -361,11 +350,11 @@ HeapTree* mergeRecursive(HeapTree* root, HeapTree* merger, deque<pair<HeapTree*,
 }
 
 
-HeapTree* merge(HeapTree* root, HeapTree* merger, deque<HeapTree*>& dbucket) {
+HeapTree* merge(HeapTree* root, HeapTree* merger) {
 
 
 	deque<pair<HeapTree*, int>> order;
-	mergeRecursive(root, merger, order, dbucket);
+	mergeRecursive(root, merger, order);
 	max_heapify(root);
 
 
@@ -394,41 +383,40 @@ int main(int argc, char** argv) {
 
 
 
-    HeapTree root(10);
+    HeapTree* root = new HeapTree(5);
 
 
-    deque<HeapTree*> dbucket;
 
-    root = *construct(myvec, &root, 0, dbucket);
+    root = construct(myvec, root, 0);
     cout << "Heap fully constructed" << endl;
-    max_heapify(&root);
+    max_heapify(root);
 
 
-    print_level_order(&root);
+    print_level_order(root);
     cout << "Heap max-heapified" << endl;
 
-    deleteMax(&root);
+    deleteMax(root);
     cout << endl;
     cout << endl;
 
-    print_level_order(&root);
+    print_level_order(root);
     cout << "root node deleted" << endl;
 
 
 
-    deleteNode(&root, 5);
+    deleteNode(root, 5);
     cout << endl;
     cout << endl;
 
-    print_level_order(&root);
+    print_level_order(root);
     cout << "Element at index 5 deleted" << endl;
 
     for(int i = 0; i < 5; ++i) {
 
-    	insertNode(&root, (i+100)*2, dbucket);
+    	insertNode(root, (i+100)*2);
     	cout << endl;
     	cout << endl;
-    	print_level_order(&root);
+    	print_level_order(root);
 
     }
     cout << endl;
@@ -442,27 +430,27 @@ int main(int argc, char** argv) {
     //Testing merge function
     vector<int> myvec2 = {23, 45, 34, 99, 87, 76, 54, 43, 33, 100};
     HeapTree merger = HeapTree(10);
-    merger = *construct(myvec2, &merger, 0, dbucket);
+    merger = *construct(myvec2, &merger, 0);
     cout << "Merging"  << endl;
     cout << endl;
     print_level_order(&merger);
     cout << endl;
     cout << "Plus" << endl;
     cout << endl;
-    print_level_order(&root);
+    print_level_order(root);
 
 
-    merge(&root, &merger, dbucket);
+    merge(root, &merger);
 
     cout << endl;
     cout << endl;
-    print_level_order(&root);
+    print_level_order(root);
     cout << endl;
     cout << endl;
     cout << "Merged two trees together!" << endl;
 
 
-    deleteHeap(dbucket);
+    delete root;
 
 
 
