@@ -38,8 +38,8 @@ public:
 
     ~HeapTree() {
 
-	if(left) delete left;
-	if(right) delete right;
+		if(left) delete left;
+		if(right) delete right;
 
 
     }
@@ -154,7 +154,13 @@ void deleteMax(HeapTree* root) {
 
 }
 
+HeapTree* extractMax(HeapTree* root) {
 
+	HeapTree* max = new HeapTree(root->data);
+	deleteMax(root);
+
+
+}
 
 
 
@@ -200,7 +206,9 @@ void print_level_order(HeapTree* node) {
 }
 
 
-HeapTree* construct(vector<int>& arr, HeapTree* node, int index) {
+
+
+HeapTree* construct(vector<int>& arr, HeapTree* node, int index=0) {
         if(index < arr.size()) {
             HeapTree* temp = new HeapTree(arr[index]);
             node = temp;
@@ -364,6 +372,23 @@ HeapTree* merge(HeapTree* root, HeapTree* merger) {
 }
 
 
+deque<int> heapsort(vector<int> unsorted) {
+	
+	HeapTree* root = new HeapTree();
+	deque<int> sorted;
+	construct(unsorted, root);	
+	max_heapify(root);
+	while(root) {
+		sorted.push_front(extractMax(root)->data);
+	}
+	delete root;
+	return sorted;
+
+	
+
+}
+
+
 
 
 
@@ -399,7 +424,7 @@ int main(int argc, char** argv) {
     cout << endl;
     cout << endl;
 
-    print_level_order(root);
+    print_level_order(root)
     cout << "root node deleted" << endl;
 
 
@@ -448,6 +473,10 @@ int main(int argc, char** argv) {
     cout << endl;
     cout << endl;
     cout << "Merged two trees together!" << endl;
+	cout << endl;
+	cout << endl;
+	cout << "Attempting Heapsort from vector:""
+	
 
 
     delete root;
