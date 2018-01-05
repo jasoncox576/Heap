@@ -156,7 +156,13 @@ void deleteMax(HeapTree* root) {
 
 
 
+HeapTree* extractMax(HeapTree* root) {
+		HeapTree* max = new HeapTree(root->data);
+		deleteMax(root);
+		return max;
 
+
+}
 
 
 
@@ -200,7 +206,7 @@ void print_level_order(HeapTree* node) {
 }
 
 
-HeapTree* construct(vector<int>& arr, HeapTree* node, int index) {
+HeapTree* construct(vector<int>& arr, HeapTree* node, int index=0) {
         if(index < arr.size()) {
             HeapTree* temp = new HeapTree(arr[index]);
             node = temp;
@@ -364,6 +370,25 @@ HeapTree* merge(HeapTree* root, HeapTree* merger) {
 }
 
 
+deque<int> heapsort(vector<int> unsorted) {
+
+	HeapTree* root = new HeapTree();
+	deque<int> sorted;
+	root = construct(unsorted, root);
+	max_heapify(root);
+	print_level_order(root);
+	int size = root->getSize();
+	for(int x = 0; x < size+1; ++x) {
+		sorted.push_front(extractMax(root)->data);
+	}
+	
+	delete root;
+	return sorted;
+
+
+
+}
+
 
 
 
@@ -372,12 +397,9 @@ int main(int argc, char** argv) {
     vector<int> myvec;
     int heap_size = -1;
 
-   //myvec = {100, 43, 45, 23, 54, 2, 1, 3, 5, 80, 98, 45};
 
     myvec = {10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
 
-    //std::sort(myvec.begin(), myvec.end());
-    //std::reverse(myvec.begin(), myvec.end());
     for(int x : myvec) cout << x << " ";
         cout << endl;
 
@@ -448,6 +470,16 @@ int main(int argc, char** argv) {
     cout << endl;
     cout << endl;
     cout << "Merged two trees together!" << endl;
+
+
+
+	// Testing heapsort
+	vector<int> myvec3 = {4, 23, 12, 3, 399, 10, 45};
+	cout << "Attempting heapsort from vector" << endl;
+	deque<int> sorted = heapsort(myvec3);
+	for(int x : sorted) {
+		cout << x << endl;
+	}
 
 
     delete root;
